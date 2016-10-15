@@ -31,8 +31,8 @@ class EML_Taxonomies {
 
         // taxonomies actions
         add_action( 'init', array( $this, 'register_eml_media_taxonomies' ) );
-        add_action( 'wp_loaded', array( $this, 'process_taxonomies' ), 999 );
-        add_action( 'wp_loaded', array( $this, 'process_terms' ), 999 );
+        add_action( 'init', array( $this, 'process_taxonomies' ), 999 );
+        add_action( 'init', array( $this, 'process_terms' ), 999 );
         add_action( 'restrict_manage_posts', array( $this, 'restrict_manage_posts' ) );
         add_action( 'parse_tax_query', array( $this, 'parse_tax_query' ) );
         add_action( 'wp_ajax_save-attachment-compat', array( $this, 'ajax_save_attachment_compat' ), 0 );
