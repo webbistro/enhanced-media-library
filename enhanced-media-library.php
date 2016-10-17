@@ -3,7 +3,7 @@
 Plugin Name: Enhanced Media Library PRO
 Plugin URI: http://wpUXsolutions.com
 Description: This plugin will be handy for those who need to manage a lot of media files.
-Version: 3.0.beta2-11
+Version: 3.0.beta2-12
 Author: wpUXsolutions
 Author URI: https://wpUXsolutions.com
 Text Domain: enhanced-media-library
@@ -30,7 +30,7 @@ class eml {
      *
      * @var string
      */
-    public $version = '3.0.beta2-11';
+    public $version = '3.0.beta2-12';
 
     /**
      * EML options.
@@ -162,9 +162,10 @@ class eml {
 
         // init actions
         add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
-        add_action( 'init', array( $this, 'register_admin_assets') );
-        add_action( 'init', array( $this, 'register_media_assets') );
-        add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets') );
+        add_action( 'init', array( $this, 'register_admin_assets' ) );
+        add_action( 'init', array( $this, 'register_media_assets' ) );
+        // add_action( 'init', array( $this, 'init' ) );
+        add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 
         // activation hook
         add_action( 'activate_' . $this->get_option( 'basename' ), array( $this, 'on_activation' ), 20 );
@@ -244,6 +245,26 @@ class eml {
 
         load_plugin_textdomain( 'enhanced-media-library', false, dirname( $this->get_option( 'basename' ) ) . '/languages' );
     }
+
+
+
+    /**
+     *  Run actions on init.
+     *
+     *  @type   action callback
+     *  @since  3.0
+     *  @date   24/09/16
+     */
+
+    // function init() {
+    //
+    //     // on update
+    //     $version = get_option( 'wpuxss_eml_version', null );
+    //
+    //     if ( ! is_null( $version ) && version_compare( $version, $this->version, '<>' ) ) {
+    //         $this->on_update();
+    //     }
+    // }
 
 
 
@@ -509,23 +530,32 @@ class eml {
          *  @since 2.3
          */
 
-        foreach ( get_taxonomies( array(), 'objects' ) as $taxonomy => $params ) {
+        //  echo '<div style="display:none;">';
+        //  print_r( $wp_taxonomies );
+        //  echo '</div>';
 
-            if ( in_array( 'attachment', $params->object_type ) &&
-                 isset( $wp_taxonomies[$taxonomy]->update_count_callback ) &&
-                 '_update_generic_term_count' === $wp_taxonomies[$taxonomy]->update_count_callback ) {
+        // foreach ( get_taxonomies( array(), 'objects' ) as $taxonomy => $params ) {
+        // foreach ( get_taxonomies( array( 'show_ui' => true, 'public' => true ), 'objects' ) as $taxonomy => $params) {
 
-                unset( $wp_taxonomies[$taxonomy]->update_count_callback );
-            }
+            // if ( in_array( 'attachment', $params->object_type ) &&
+            //      isset( $wp_taxonomies[$taxonomy]->update_count_callback ) &&
+            //      '_update_generic_term_count' === $wp_taxonomies[$taxonomy]->update_count_callback ) {
+            //
+            //     unset( $wp_taxonomies[$taxonomy]->update_count_callback );
+            // }
 
-            if ( in_array( 'post', $params->object_type ) ) {
+            // $post_types = array( 'post', 'attachment' );
+            //
+            // if ( count( array_intersect( $post_types, $params->object_type ) ) == count( $post_types ) ) {
 
-                if ( in_array( 'attachment', $params->object_type ) )
-                    $wp_taxonomies[$taxonomy]->update_count_callback = '_eml_update_post_term_count';
-                else
-                    unset( $wp_taxonomies[$taxonomy]->update_count_callback );
-            }
-        } // foreach
+            // if ( in_array( 'post', $params->object_type ) &&  ) {
+            //
+            //     if ( in_array( 'attachment', $params->object_type ) )
+                    // $wp_taxonomies[$taxonomy]->update_count_callback = '_eml_update_post_term_count';
+                // else
+                //     unset( $wp_taxonomies[$taxonomy]->update_count_callback );
+        //     }
+        // } // foreach
     }
 
 

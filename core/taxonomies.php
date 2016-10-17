@@ -315,6 +315,10 @@ class EML_Taxonomies {
                 if ( in_array( 'post', $taxonomy->object_type ) ) {
                     $wp_taxonomies[$taxonomy_name]->update_count_callback = '_eml_update_post_term_count';
                 }
+
+                if ( 1 == count( $taxonomy->object_type ) ) {
+                    $wp_taxonomies[$taxonomy_name]->update_count_callback = '_eml_update_attachment_term_count';
+                }
             }
 
             if ( ! (bool) $params['assigned'] ) {
@@ -332,7 +336,7 @@ class EML_Taxonomies {
         // clean currently unregistered non-eml taxonomies out of processed taxonomies
         foreach( $processed_taxonomies as $taxonomy => $params ) {
 
-            if ( ! (bool) $params['eml_media'] && ! isset( $taxonomies[$taxonomy] ) ) {
+            if ( ! (bool) $params['eml_media'] && ! isset( $wp_taxonomies[$taxonomy] ) ) {
                 unset( $processed_taxonomies[$taxonomy] );
             }
         }
@@ -343,6 +347,8 @@ class EML_Taxonomies {
             update_option( 'wpuxss_eml_taxonomies', $processed_taxonomies );
             eml()->update_option( 'taxonomies', $processed_taxonomies );
         }
+
+        // print_r( $wp_taxonomies );
     }
 
 
@@ -836,6 +842,8 @@ class EML_Taxonomies {
      */
 
     function attachment_fields_to_edit( $form_fields, $post ) {
+
+        // print_r($form_fields);
 
         $eml_tax_options = eml()->get_option( 'tax_options' );
         $walker = new EML_Walker_Term_Checklist;
