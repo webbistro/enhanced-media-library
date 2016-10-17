@@ -863,6 +863,7 @@ class EML_Taxonomies {
 
 
             $terms = $this->get_taxonomy_terms( $taxonomy );
+            // $terms = get_terms($taxonomy, array( 'fields'=>'all', 'get'=>'all' ) );
 
 
             if ( ! empty( $terms ) ) {
