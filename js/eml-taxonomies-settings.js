@@ -35,8 +35,8 @@
 
 
     // create new taxonomy
-    $(document).on( 'click', '.wpuxss-eml-button-create-taxonomy', function()
-    {
+    $(document).on( 'click', '.wpuxss-eml-button-create-taxonomy', function() {
+
         $('.wpuxss-eml-media-taxonomy-list').find('.wpuxss-eml-clone').clone().attr('class','wpuxss-eml-clone-taxonomy').appendTo('.wpuxss-eml-media-taxonomy-list').show(300);
 
         return false;
@@ -179,6 +179,7 @@
         var fields = {
                 'labels' : [ 'name', 'menu_name', 'all_items', 'edit_item', 'view_item', 'update_item', 'add_new_item', 'new_item_name', 'parent_item', 'search_items' ],
                 'hierarchical' : 'hierarchical',
+                'tax_archive' : 'tax_archive',
                 'show_admin_column' : 'show_admin_column',
                 'admin_filter' : 'admin_filter',
                 'media_uploader_filter' : 'media_uploader_filter',
@@ -227,8 +228,8 @@
 
 
     // on change of a plural taxonomy name during creation
-    $(document).on( 'blur', '.wpuxss-eml-clone-taxonomy .wpuxss-eml-name, .wpuxss-eml-taxonomy .wpuxss-eml-name', function()
-    {
+    $(document).on( 'blur', '.wpuxss-eml-clone-taxonomy .wpuxss-eml-name, .wpuxss-eml-taxonomy .wpuxss-eml-name', function() {
+
         var taxonomy_plural_name = $(this).val().replace(/(<([^>]+)>)/g,''),
             taxonomy_edit_box = $(this).parents('.wpuxss-eml-taxonomy-edit'),
             main_tax_label = $(this).closest('.wpuxss-eml-clone-taxonomy').find('.wpuxss-eml-taxonomy-label span');
@@ -303,6 +304,7 @@
 
 
     // synchronize parent terms to media items (PRO)
+    // TODO: move to PRO
     $( document ).on( 'click', '.eml-button-synchronize-terms', function( event ) {
 
         var $el, post_type, taxonomy;

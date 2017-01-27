@@ -1,9 +1,9 @@
 <?php
 /*
-Plugin Name: Enhanced Media Library PRO
+Plugin Name: Enhanced Media Library
 Plugin URI: http://wpUXsolutions.com
 Description: This plugin will be handy for those who need to manage a lot of media files.
-Version: 3.0.beta2-12
+Version: 3.0.beta2-25
 Author: wpUXsolutions
 Author URI: https://wpUXsolutions.com
 Text Domain: enhanced-media-library
@@ -30,7 +30,7 @@ class eml {
      *
      * @var string
      */
-    public $version = '3.0.beta2-12';
+    public $version = '3.0.beta2-25';
 
     /**
      * EML options.
@@ -291,6 +291,7 @@ class eml {
         $eml_taxonomies['media_category'] = array(
             'assigned' => 1,
             'eml_media' => 1,
+            'media_only' => 1,
             'public' => 1,
 
             'labels' => array(
@@ -309,6 +310,7 @@ class eml {
             ),
 
             'hierarchical' => 1,
+            'tax_archive' => 1,
 
             'show_admin_column' => 1,
             'admin_filter' => 1,          // list view filter
@@ -327,11 +329,12 @@ class eml {
         $eml_lib_options = array(
             'enhance_media_shortcodes' => 0,
             'media_orderby' => 'date',
-            'media_order' => 'DESC'
+            'media_order' => 'DESC',
+            'frontend_scripts' => 0
         );
 
         $eml_tax_options = array(
-            'tax_archives' => 1,
+            // 'tax_archives' => 1,
             'edit_all_as_hierarchical' => 0,
             'force_filters' => 0,
             'show_count' => 1
@@ -380,7 +383,7 @@ class eml {
 
     function on_update() {
 
-        global $wp_taxonomies;
+        // global $wp_taxonomies;
 
 
         // update version
@@ -416,10 +419,11 @@ class eml {
             }
 
             // unset since 2.2
-            if ( $taxonomy == 'link_category' ) {
-                unset( $eml_taxonomies[$taxonomy] );
-            }
+            // if ( $taxonomy == 'link_category' ) {
+            //     unset( $eml_taxonomies[$taxonomy] );
+            // }
 
+            // unset since 2.2
             if ( ! (bool) $params['eml_media'] ) {
 
                 if ( isset( $params['hierarchical'] ) ) {
@@ -441,6 +445,18 @@ class eml {
                     unset( $eml_taxonomies[$taxonomy]['show_in_rest'] );
                 }
             }
+
+            // error_log( print_r($params,true) );
+
+            // since 3.0
+            // we seem to not need it because media_only is being checked every 'init' at 286 of taxonomy.php
+            // actually, we need this because it's about tax_archive, not about media_only
+            if ( /* (bool) $params['media_only'] && */ ! isset( $params['tax_archive'] ) ) {
+                $eml_taxonomies[$taxonomy]['tax_archive'] = isset( $eml_tax_options['tax_archives'] ) ? $eml_tax_options['tax_archives'] : 1;
+            }
+            // elseif ( isset( $params['tax_archive'] ) ) {
+            //     unset( $eml_taxonomies[$taxonomy]['tax_archive'] );
+            // }
         }
 
 
@@ -448,7 +464,7 @@ class eml {
         if ( is_null( $eml_tax_options ) ) {
 
             $eml_tax_options = array(
-                'tax_archives' => 1,
+                // 'tax_archives' => 1,
                 'edit_all_as_hierarchical' => 0,
                 'force_filters' => 0,
                 'show_count' => 1
@@ -459,6 +475,10 @@ class eml {
             // since 2.3
             if ( ! isset( $eml_tax_options['show_count'] ) )
                 $eml_tax_options['show_count'] = 1;
+
+            // since 3.0
+            if ( isset( $eml_tax_options['tax_archives'] ) )
+                unset( $eml_tax_options['tax_archives'] );
         }
 
 
@@ -502,6 +522,9 @@ class eml {
                     'media_order' => 'DESC'
                 );
             }
+
+            // since 3.0
+            $eml_lib_options['frontend_scripts'] = 0;
         }
         else {
 
@@ -510,6 +533,10 @@ class eml {
                 $eml_lib_options['media_orderby'] = 'date';
             if ( ! isset( $eml_lib_options['media_order'] ) )
                 $eml_lib_options['media_order'] = 'DESC';
+
+            // since 3.0
+            if ( ! isset( $eml_lib_options['frontend_scripts'] ) )
+                $eml_lib_options['frontend_scripts'] = 0;
         }
 
 
@@ -579,7 +606,8 @@ class eml {
 
 
         // styles
-        wp_register_style( 'eml-admin', $dir . 'css/eml-admin.css', false, $version, 'all' );
+        wp_register_style( 'eml-admin', $dir . 'css/eml-admin.css', array(), $version, 'all' );
+        // wp_register_style( 'eml-admin-rtl', $dir . 'css/eml-admin-rtl.css', array(), $version, 'all' );
     }
 
 
@@ -602,10 +630,14 @@ class eml {
         // scripts
         wp_register_script( 'eml-media-models', $dir . 'js/eml-media-models.js', array('media-models'), $version, true );
         wp_register_script( 'eml-media-views', $dir . 'js/eml-media-views.js', array('media-views'), $version, true );
-        wp_register_script( 'eml-media-grid-mode', $dir . 'js/eml-media-grid-mode.js', array('media'), $version, true );
+        wp_register_script( 'eml-media-grid-mode', $dir . 'js/eml-media-grid-mode.js', array('eml-media-models','eml-media-views'), $version, true );
         wp_register_script( 'eml-media-list-mode', $dir . 'js/eml-media-list-mode.js', array('jquery'), $version, true );
         wp_register_script( 'eml-media-shortcodes', $dir . 'js/eml-media-shortcodes.js', array('media-views'), $version, true );
         wp_register_script( 'eml-media-editor', $dir . 'js/eml-media-editor.js', array('media-editor','media-views', 'eml-media-shortcodes'), $version, true );
+
+
+        // styles
+        wp_register_style( 'eml-media', $dir . 'css/eml-media.css', array(), $version, 'all' );
     }
 
 
@@ -625,7 +657,9 @@ class eml {
 
         // styles
         wp_enqueue_style( 'eml-admin' );
-        wp_enqueue_style ( 'wp-jquery-ui-dialog' );
+        wp_style_add_data( 'eml-admin', 'rtl', 'replace' );
+
+        wp_enqueue_style( 'wp-jquery-ui-dialog' );
     }
 
 

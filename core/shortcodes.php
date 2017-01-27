@@ -21,7 +21,7 @@ class EML_Shortcodes {
         if ( $this->is_on() ) {
 
             // media assets
-            add_action( 'wp_enqueue_media', array( $this, 'enqueue_media_assets') );
+            add_action( 'wp_enqueue_media', array( $this, 'enqueue_media_assets' ) );
 
             // shortcodes filters
             add_filter( 'shortcode_atts_gallery', array( $this, 'shortcode_atts' ), 10, 3 );
@@ -63,7 +63,10 @@ class EML_Shortcodes {
 
     function enqueue_media_assets() {
 
-        if ( ! is_admin() ) {
+        $lib_options = eml()->get_option( 'lib_options' );
+
+
+        if ( ( ! (bool) $lib_options['frontend_scripts'] || ! current_user_can( 'manage_categories' ) ) && ! is_admin() ) {
             return;
         }
 

@@ -168,9 +168,21 @@ class EML_Settings {
             }
 
 
+            if ( taxonomy_exists( $taxonomy ) ) {
+
+                $tax_object = get_taxonomy( $taxonomy );
+                $object_type = (array) $tax_object->object_type;
+                $media_only = ( in_array( 'attachment', $object_type ) && count( $object_type ) == 1 ) ? 1 : 0;
+            }
+            else {
+                $media_only = 1;
+            }
+
+
+            $input[$taxonomy]['media_only'] = $media_only;
             $input[$taxonomy]['eml_media'] = isset( $params['eml_media'] ) && !! $params['eml_media'] ? 1 : 0;
 
-            if ( $input[$taxonomy]['eml_media'] ) {
+            if ( (bool) $input[$taxonomy]['eml_media'] ) {
                 $input[$taxonomy]['hierarchical'] = isset($params['hierarchical']) && !! $params['hierarchical'] ? 1 : 0;
                 $input[$taxonomy]['show_in_rest'] = isset($params['show_in_rest']) && !! $params['show_in_rest'] ? 1 : 0;
                 $input[$taxonomy]['sort'] = isset($params['sort']) && !! $params['sort'] ? 1 : 0;
@@ -180,9 +192,16 @@ class EML_Settings {
                 $input[$taxonomy]['rewrite']['slug'] = isset($params['rewrite']['slug']) ? $this->sanitize_slug( $params['rewrite']['slug'], $taxonomy ) : '';
             }
 
-            if ( ! $input[$taxonomy]['eml_media'] ) {
+            if ( ! (bool) $input[$taxonomy]['eml_media'] ) {
                 $input[$taxonomy]['taxonomy_auto_assign'] = isset($params['taxonomy_auto_assign']) && !! $params['taxonomy_auto_assign'] ? 1 : 0;
             }
+
+            // if ( (bool) $media_only ) {
+                $input[$taxonomy]['tax_archive'] = isset($params['tax_archive']) && !! $params['tax_archive'] ? 1 : 0;
+            // }
+            // else {
+            //     $input[$taxonomy]['tax_archive'] = 0;
+            // }
 
 
             $input[$taxonomy]['assigned'] = isset($params['assigned']) && !! $params['assigned'] ? 1 : 0;
@@ -716,7 +735,7 @@ class EML_Settings {
                                     <table class="form-table">
 
                                         <tr>
-                                            <th scope="row"><?php _e('Enhanced media shortcodes','enhanced-media-library'); ?></th>
+                                            <th scope="row"><label for="wpuxss_eml_lib_options[enhance_media_shortcodes]"><?php _e('Enhanced media shortcodes','enhanced-media-library'); ?></label></th>
                                             <td>
                                                 <fieldset>
                                                     <legend class="screen-reader-text"><span><?php _e('Enhanced media shortcodes','enhanced-media-library'); ?></span></legend>
@@ -733,6 +752,33 @@ class EML_Settings {
                                                 </fieldset>
                                             </td>
                                         </tr>
+                                    </table>
+
+                                    <?php submit_button(); ?>
+
+                                </div>
+
+                            </div>
+
+                            <div class="postbox">
+
+                                <h3 class="hndle"><?php _e('Media Scripts','enhanced-media-library'); ?></h3>
+
+                                <div class="inside">
+
+                                    <table class="form-table">
+
+                                        <tr>
+                                            <th scope="row"><label for="wpuxss_eml_lib_options[frontend_scripts]"><?php _e('Front-end scripts','enhanced-media-library'); ?></label></th>
+                                            <td>
+                                                <fieldset>
+                                                    <legend class="screen-reader-text"><span><?php _e('Front-end scripts','enhanced-media-library'); ?></span></legend>
+                                                    <label><input name="wpuxss_eml_lib_options[frontend_scripts]" type="hidden" value="0"><input name="wpuxss_eml_lib_options[frontend_scripts]" type="checkbox" value="1" <?php checked( true, (bool) $eml_lib_options['frontend_scripts'], true ); ?> /> Add media filters and checkboxes for a front-end media editor.</label>
+                                                    <p class="description"><?php _e( 'Try this if you need media filters or categories for visual page builders, front-end forms, etc.', 'enhanced-media-library' );  ?></p>
+                                                </fieldset>
+                                            </td>
+                                        </tr>
+
                                     </table>
 
                                     <?php submit_button(); ?>
@@ -806,10 +852,11 @@ class EML_Settings {
                                     foreach ( $processed_taxonomies as $taxonomy_name => $params ) {
 
                                         $taxonomy = get_taxonomy( $taxonomy_name );
-                                        $object_type = (array) $taxonomy->object_type;
+                                        // $object_type = (array) $taxonomy->object_type;
 
 
-                                        if ( empty( $object_type ) || in_array( 'attachment', $object_type ) && count( $object_type ) == 1 ) {
+                                        // if ( empty( $object_type ) || in_array( 'attachment', $object_type ) && count( $object_type ) == 1 ) {
+                                        if ( (bool) $params['media_only'] ) {
 
                                             $assigned = (bool) $params['assigned'];
                                             $eml_media = (bool) $params['eml_media'];
@@ -853,6 +900,7 @@ class EML_Settings {
                                                 $html .= '<ul>';
                                                 $html .= '<li><label>' . __('Taxonomy Name','enhanced-media-library') . '</label><input type="text" class="wpuxss-eml-taxonomy-name" name="" value="' . esc_attr($taxonomy->name) . '" disabled="disabled" /></li>';
                                                 $html .= '<li><label>' . __('Hierarchical','enhanced-media-library') . '</label><input type="checkbox" class="wpuxss-eml-hierarchical" name="wpuxss_eml_taxonomies[' . $taxonomy->name . '][hierarchical]" value="1" ' . checked( 1, $taxonomy->hierarchical, false ) . ' /></li>';
+                                                $html .= '<li><label>' . __('Taxonomy archive page','enhanced-media-library') . '</label><input type="checkbox" class="wpuxss-eml-tax_archive" name="wpuxss_eml_taxonomies[' . $taxonomy->name . '][tax_archive]" value="1" ' . checked( 1, $params['tax_archive'], false ) . ' /></li>';
                                                 $html .= '<li><label>' . __('Column for List View','enhanced-media-library') . '</label><input type="checkbox" class="wpuxss-eml-show_admin_column" name="wpuxss_eml_taxonomies[' . $taxonomy->name . '][show_admin_column]" value="1" ' . checked( 1, $taxonomy->show_admin_column, false ) . ' /></li>';
                                                 $html .= '<li><label>' . __('Filter for List View','enhanced-media-library') . '</label><input type="checkbox" class="wpuxss-eml-admin_filter" name="wpuxss_eml_taxonomies[' . $taxonomy->name . '][admin_filter]" value="1" ' . checked( 1, (bool) $params['admin_filter'], false ) . ' /></li>';
                                                 $html .= '<li><label>' . __('Filter for Grid View / Media Popup','enhanced-media-library') . '</label><input type="checkbox" class="wpuxss-eml-media_uploader_filter" name="wpuxss_eml_taxonomies[' . $taxonomy->name . '][media_uploader_filter]" value="1" ' . checked( 1, (bool) $params['media_uploader_filter'], false ) . ' /></li>';
@@ -874,6 +922,7 @@ class EML_Settings {
                                                 $html .= '<div class="wpuxss-eml-settings-edit">';
                                                 $html .= '<h4>' . __('Settings','enhanced-media-library') . '</h4>';
                                                 $html .= '<ul>';
+                                                $html .= '<li><label>' . __('Taxonomy archive page','enhanced-media-library') . '</label><input type="checkbox" class="wpuxss-eml-tax_archive" name="wpuxss_eml_taxonomies[' . $taxonomy->name . '][tax_archive]" value="1" ' . checked( 1, (bool) $params['tax_archive'], false ) . ' /></li>';
                                                 $html .= '<li><label>' . __('Filter for List View','enhanced-media-library') . '</label><input type="checkbox" class="wpuxss-eml-admin_filter" name="wpuxss_eml_taxonomies[' . $taxonomy->name . '][admin_filter]" value="1" ' . checked( 1, (bool) $params['admin_filter'], false ) . ' /></li>';
                                                 $html .= '<li><label>' . __('Filter for Grid View / Media Popup','enhanced-media-library') . '</label><input type="checkbox" class="wpuxss-eml-media_uploader_filter" name="wpuxss_eml_taxonomies[' . $taxonomy->name . '][media_uploader_filter]" value="1" ' . checked( 1, (bool) $params['media_uploader_filter'], false ) . ' /></li>';
                                                 $html .= '<li><label>' . __('Edit in Media Popup','enhanced-media-library') . '</label><input type="checkbox" class="wpuxss-eml-media_popup_taxonomy_edit" name="wpuxss_eml_taxonomies[' . $taxonomy->name . '][media_popup_taxonomy_edit]" value="1" ' . checked( 1, (bool) $params['media_popup_taxonomy_edit'], false ) . ' /></li>';
@@ -916,6 +965,7 @@ class EML_Settings {
                                     $html .= '<ul>';
                                     $html .= '<li><label>' . __('Taxonomy Name','enhanced-media-library') . '</label><input type="text" class="wpuxss-eml-taxonomy-name" name="" value="" disabled="disabled" /></li>';
                                     $html .= '<li><label>' . __('Hierarchical','enhanced-media-library') . '</label><input type="checkbox" class="wpuxss-eml-hierarchical" name="" value="1" checked="checked" /></li>';
+                                    $html .= '<li><label>' . __('Taxonomy archive page','enhanced-media-library') . '</label><input type="checkbox" class="wpuxss-eml-tax_archive" name="" value="1" checked="checked" /></li>';
                                     $html .= '<li><label>' . __('Column for List View','enhanced-media-library') . '</label><input class="wpuxss-eml-show_admin_column" type="checkbox" name="" value="1" /></li>';
                                     $html .= '<li><label>' . __('Filter for List View','enhanced-media-library') . '</label><input class="wpuxss-eml-admin_filter" type="checkbox"  name="" value="1" /></li>';
                                     $html .= '<li><label>' . __('Filter for Grid View / Media Popup','enhanced-media-library') . '</label><input class="wpuxss-eml-media_uploader_filter" type="checkbox" name="" value="1" /></li>';
@@ -978,6 +1028,7 @@ class EML_Settings {
 
                                                     $html .= '<h4>' . __('Settings','enhanced-media-library') . '</h4>';
                                                     $html .= '<ul>';
+                                                    // $html .= '<li><input type="checkbox" class="wpuxss-eml-tax_archive" name="wpuxss_eml_taxonomies[' . $taxonomy->name . '][tax_archive]" id="wpuxss_eml_taxonomies-' . $taxonomy->name . '-tax_archive" value="1" ' . checked( 1, (bool) $processed_taxonomies[$taxonomy->name]['tax_archive'], false ) . ' /><label for="wpuxss_eml_taxonomies-' . $taxonomy->name . '-tax_archive">' . __('Taxonomy archive page','enhanced-media-library') . '</label></li>';
                                                     $html .= '<li><input type="checkbox" class="wpuxss-eml-admin_filter" name="wpuxss_eml_taxonomies[' . $taxonomy->name . '][admin_filter]" id="wpuxss_eml_taxonomies-' . $taxonomy->name . '-admin_filter" value="1" ' . checked( 1, (bool) $processed_taxonomies[$taxonomy->name]['admin_filter'], false ) . ' /><label for="wpuxss_eml_taxonomies-' . $taxonomy->name . '-admin_filter">' . __('Filter for List View','enhanced-media-library') . '</label></li>';
                                                     $html .= '<li><input type="checkbox" class="wpuxss-eml-media_uploader_filter" name="wpuxss_eml_taxonomies[' . $taxonomy->name . '][media_uploader_filter]" id="wpuxss_eml_taxonomies-' . $taxonomy->name . '-media_uploader_filter" value="1" ' . checked( 1, (bool) $processed_taxonomies[$taxonomy->name]['media_uploader_filter'], false ) . ' /><label for="wpuxss_eml_taxonomies-' . $taxonomy->name . '-media_uploader_filter">' . __('Filter for Grid View / Media Popup','enhanced-media-library') . '</label></li>';
                                                     $html .= '<li><input type="checkbox" class="wpuxss-eml-media_popup_taxonomy_edit" name="wpuxss_eml_taxonomies[' . $taxonomy->name . '][media_popup_taxonomy_edit]" id="wpuxss_eml_taxonomies-' . $taxonomy->name . '-media_popup_taxonomy_edit" value="1" ' . checked( 1, (bool) $processed_taxonomies[$taxonomy->name]['media_popup_taxonomy_edit'], false ) . ' /><label for="wpuxss_eml_taxonomies-' . $taxonomy->name . '-media_popup_taxonomy_edit">' . __('Edit in Media Popup','enhanced-media-library') . '</label></li>';
@@ -1015,20 +1066,11 @@ class EML_Settings {
 
                             <div class="postbox">
 
+                                <h3 class="hndle"><?php _e('For All Taxonomies Assigned to Media Library','enhanced-media-library'); ?></h3>
+
                                 <div class="inside">
 
                                     <table class="form-table">
-                                        <tr>
-                                            <th scope="row"><?php _e('Taxonomy archive pages','enhanced-media-library'); ?></th>
-                                            <td>
-                                                <fieldset>
-                                                    <legend class="screen-reader-text"><span><?php _e('Taxonomy archive pages','enhanced-media-library'); ?></span></legend>
-                                                    <label><input name="wpuxss_eml_tax_options[tax_archives]" type="hidden" value="0" /><input name="wpuxss_eml_tax_options[tax_archives]" type="checkbox" value="1" <?php checked( true, (bool) $eml_tax_options['tax_archives'], true ); ?> /> <?php _e('Turn on media taxonomy archive pages on the front-end','enhanced-media-library'); ?></label>
-                                                    <p class="description"><?php _e( 'Re-save your permalink settings after this option change to make it work.', 'enhanced-media-library' ); ?></p>
-                                                </fieldset>
-                                            </td>
-                                        </tr>
-
                                         <tr>
                                             <th scope="row"><?php _e('Assign all like hierarchical','enhanced-media-library'); ?></th>
                                             <td>
@@ -1056,6 +1098,7 @@ class EML_Settings {
                                                 <fieldset>
                                                     <legend class="screen-reader-text"><span><?php _e('Show count','enhanced-media-library'); ?></span></legend>
                                                     <label><input name="wpuxss_eml_tax_options[show_count]" type="hidden" value="0" /><input name="wpuxss_eml_tax_options[show_count]" type="checkbox" value="1" <?php checked( true, (bool) $eml_tax_options['show_count'], true ); ?> /> <?php _e('Show item count per category for media filters','enhanced-media-library'); ?></label>
+                                                    <p class="description"><?php _e( 'Turning off this option can significantly reduce loading time for media library especially in case you have a lot of categories.', 'enhanced-media-library' ); ?></p>
                                                 </fieldset>
                                             </td>
                                         </tr>
@@ -1405,19 +1448,24 @@ class EML_Settings {
 
     function print_eml_credits() {
 
-        $version = eml()->version; ?>
+        $version = eml()->version;
+        $eml_name = eml()->get_option( 'name' ); ?>
 
         <div class="postbox" id="wpuxss-credits">
 
-            <h3 class="hndle"><?php echo( eml()->get_option( 'name' ) . ' ' . $version ); ?></h3>
+            <h3 class="hndle"><?php echo( $eml_name . ' ' . $version ); ?></h3>
 
             <div class="inside">
 
                 <h4><?php _e( 'Changelog', 'enhanced-media-library' ); ?></h4>
                 <p><?php _e( 'What\'s new in', 'enhanced-media-library' ); ?> <a href="http://wordpress.org/plugins/enhanced-media-library/changelog/"><?php _e( 'version', 'enhanced-media-library' ); echo ' ' . $version; ?></a>.</p>
 
-                <h4>Enhanced Media Library PRO</h4>
-                <p><?php _e( 'More features under the hood', 'enhanced-media-library' ); ?> <a href="http://www.wpuxsolutions.com/plugins/enhanced-media-library/">www.wpuxsolutions.com</a>.</p>
+                <?php if ( 'Enhanced Media Library PRO' !== $eml_name ) { ?>
+
+                    <h4>Enhanced Media Library PRO</h4>
+                    <p><?php _e( 'More features under the hood', 'enhanced-media-library' ); ?> <a href="http://www.wpuxsolutions.com/plugins/enhanced-media-library/">www.wpuxsolutions.com</a>.</p>
+
+                <?php } ?>
 
                 <h4><?php _e( 'Support', 'enhanced-media-library' ); ?></h4>
                 <p><?php _e( 'Feel free to ask for help on', 'enhanced-media-library' ); ?> <a href="http://www.wpuxsolutions.com/support/">www.wpuxsolutions.com</a>. <?php _e( 'Support is free for both versions of the plugin.', 'enhanced-media-library' ); ?></p>

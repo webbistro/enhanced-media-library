@@ -3,6 +3,13 @@
     var w;
 
 
+    // TODO: move to the file for media tab only
+    if ( 'settings_page_media' == window.adminpage )
+        window.adminpage = 'options-media-php';
+    if ( 'settings_page_media' == window.pagenow )
+        window.pagenow = 'options-media';
+
+
     if ( $(window).width() < 600 )
         w = '90%';
     else if ( $(window).width() > 1024 )
