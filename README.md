@@ -9,7 +9,7 @@
 ### Changelog
 
 * Total code refactoring
-* Better performance
+* Performance issues addressed
 * Polylang compatibility
 * Front-end scripts - compatibility with various page builders
 * Tax archives per taxonomy
