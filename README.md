@@ -9,5 +9,5 @@ WordPress plugin
 * Total code refactoring
 * Better performance
 * Polylang compatibility
-* Front-end scripts - compatibility with various pae builders
+* Front-end scripts - compatibility with various page builders
 * Tax archives per taxonomy
