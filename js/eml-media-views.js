@@ -717,6 +717,7 @@ window.eml = window.eml || { l10n: {} };
 
             if ( -1 !== $.inArray( this.options.filters, [ 'uploaded', 'all' ] ) ||
                 ( parseInt( eml.l10n.force_filters ) &&
+                ! this.controller.isModeActive( 'eml-bulk-edit' ) &&
                 'gallery-edit' !== this.controller._state &&
                 'playlist-edit' !== this.controller._state &&
                 'video-playlist-edit' !== this.controller._state ) ||

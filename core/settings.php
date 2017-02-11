@@ -11,12 +11,26 @@ if ( ! class_exists( 'EML_Settings' ) ) :
 class EML_Settings {
 
     /**
-     * Constructor.
+     * Constructor. Intentionally left empty.
      *
      * @since   3.0
      */
 
-    function __construct() {
+    function __construct() {}
+
+
+
+    /**
+     *  The real constructor to initialize EML_Settings.
+     *
+     *  @since  3.0
+     *  @date   30/01/17
+     *
+     *  @param  N/A
+     *  @return N/A
+     */
+
+    function initialize() {
 
         // settings actions
         add_action( 'admin_init', array( $this, 'register_setting' ) );
@@ -43,10 +57,6 @@ class EML_Settings {
      */
 
     function register_setting() {
-
-        // echo '<pre>';
-        // echo '                          register_settings';
-        // echo '</pre>';
 
         // plugin settings: media library
         register_setting(
@@ -383,10 +393,6 @@ class EML_Settings {
     function admin_menu() {
 
         global $menu, $submenu;
-
-        // echo '<pre>';
-        // echo '                          admin_menu';
-        // echo '</pre>';
 
 
         if ( isset( $submenu['options-general.php'] ) ) {
@@ -773,7 +779,7 @@ class EML_Settings {
                                             <td>
                                                 <fieldset>
                                                     <legend class="screen-reader-text"><span><?php _e('Front-end scripts','enhanced-media-library'); ?></span></legend>
-                                                    <label><input name="wpuxss_eml_lib_options[frontend_scripts]" type="hidden" value="0"><input name="wpuxss_eml_lib_options[frontend_scripts]" type="checkbox" value="1" <?php checked( true, (bool) $eml_lib_options['frontend_scripts'], true ); ?> /> Add media filters and checkboxes for a front-end media editor.</label>
+                                                    <label><input name="wpuxss_eml_lib_options[frontend_scripts]" type="hidden" value="0"><input name="wpuxss_eml_lib_options[frontend_scripts]" type="checkbox" value="1" <?php checked( true, (bool) $eml_lib_options['frontend_scripts'], true ); ?> /> Add media filters and checkboxes for a front-end media editor</label>
                                                     <p class="description"><?php _e( 'Try this if you need media filters or categories for visual page builders, front-end forms, etc.', 'enhanced-media-library' );  ?></p>
                                                 </fieldset>
                                             </td>
@@ -1858,9 +1864,11 @@ class EML_Settings {
             'wpuxss_eml_mimes_backup',
             'wpuxss_eml_mimes',
             'wpuxss_eml_backup',
-            'wpuxss_eml_pro_bulkedit_savebutton_off',
-            'wpuxss_eml_pro_license_key',
+            // 'wpuxss_eml_pro_bulkedit_savebutton_off',
+            // 'wpuxss_eml_pro_license_key',
         );
+
+        $options = apply_filters( 'wpuxss_eml_extend_cleanup_options', $options );
 
         foreach ( $options as $option ) {
             delete_option( $option );

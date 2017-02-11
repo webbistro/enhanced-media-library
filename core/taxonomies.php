@@ -17,13 +17,30 @@ class EML_Taxonomies {
      */
     public $terms = array();
 
+
+
+
     /**
-     * Constructor.
+     * Constructor. Intentionally left empty.
      *
      * @since   3.0
      */
 
-    function __construct() {
+    function __construct() {}
+
+
+
+    /**
+     *  The real constructor to initialize EML_Taxonomies.
+     *
+     *  @since  3.0
+     *  @date   30/01/17
+     *
+     *  @param  N/A
+     *  @return N/A
+     */
+
+    function initialize() {
 
         // media assets
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
@@ -276,10 +293,11 @@ class EML_Taxonomies {
 
 
         $processed_taxonomies = eml()->get_option( 'taxonomies' );
+        $taxonomies = get_taxonomies( array( 'show_ui' => true, 'public' => true ), 'objects' );
         $change = false;
 
 
-        foreach ( get_taxonomies( array( 'show_ui' => true, 'public' => true ), 'objects' ) as $taxonomy => $params ) {
+        foreach ( $taxonomies as $taxonomy => $params ) {
 
             $object_type = (array) $params->object_type;
             $media_only = ( in_array( 'attachment', $object_type ) && count( $object_type ) == 1 ) ? 1 : 0;
@@ -320,11 +338,16 @@ class EML_Taxonomies {
 
 
         // TODO: test this carefully
-        // clean currently unregistered non-eml taxonomies out of processed taxonomies
+        // clean currently unregistered, not public,
+        // and non-eml taxonomies out of processed taxonomies
         foreach( $processed_taxonomies as $taxonomy => $params ) {
 
             // if ( ! (bool) $params['eml_media'] && ! taxonomy_exists( $taxonomy ) ) {
-            if ( (bool) $params['eml_media'] || taxonomy_exists( $taxonomy ) ) {
+            if ( (bool) $params['eml_media'] ) {
+                continue;
+            }
+
+            if ( array_key_exists( $taxonomy, $taxonomies ) ) {
                 continue;
             }
 
@@ -384,8 +407,6 @@ class EML_Taxonomies {
             update_option( 'wpuxss_eml_taxonomies', $processed_taxonomies );
             eml()->update_option( 'taxonomies', $processed_taxonomies );
         }
-
-        // print_r( $wp_taxonomies );
     }
 
 
@@ -403,8 +424,6 @@ class EML_Taxonomies {
     function get_processed_taxonomies( $args = array() ) {
 
         $taxonomies = eml()->get_option( 'taxonomies' );
-
-        // print_r($taxonomies);
 
 
         if ( empty( $args ) ) {
@@ -511,8 +530,6 @@ class EML_Taxonomies {
 
     function ajax_query_attachments_args( $query ) {
 
-        // print_r($query);
-
         $processed_taxonomies = $this->get_processed_taxonomies( array( 'assigned' => true ) );
 
         $eml_query = isset( $_REQUEST['query'] ) ? (array) $_REQUEST['query'] : array();
@@ -536,18 +553,12 @@ class EML_Taxonomies {
 
         $tax_query = array();
 
-        // print_r( $keys );
-        // print_r( $eml_query );
-
 
         foreach ( $processed_taxonomies as $taxonomy_name => $params ) {
 
             // $taxonomy = get_taxonomy( $taxonomy_name );
             $terms = $this->get_taxonomy_terms( $taxonomy_name );
             $terms_id_tt_id = $this->get_media_term_pairs( $terms, 'id=>tt_id' );
-
-            // print_r($terms);
-            // wp_die();
 
 
             if ( $uncategorized ) {
@@ -566,11 +577,7 @@ class EML_Taxonomies {
             }
             else {
 
-                // print_r($taxonomy);
-
                 if ( isset( $query[$taxonomy_name] ) && $query[$taxonomy_name] ) {
-
-                    // print_r($query);
 
                     if( is_numeric( $query[$taxonomy_name] ) ||
                         is_array( $query[$taxonomy_name] ) ) {
@@ -615,8 +622,6 @@ class EML_Taxonomies {
             $tax_query['relation'] = 'AND';
             $query['tax_query'] = $tax_query;
         }
-
-        // print_r($query);
 
         return $query;
     }
@@ -881,16 +886,6 @@ class EML_Taxonomies {
      */
 
     function attachment_fields_to_edit( $form_fields, $post ) {
-
-        // print_r($form_fields);
-        // $lib_options = eml()->get_option( 'lib_options' );
-
-
-        // if ( ! (bool) $lib_options['frontend_scripts'] && ! is_admin() ) {
-        // if ( ! is_admin() ) {
-        //     return $form_fields;
-        // }
-
 
         $tax_options = eml()->get_option( 'tax_options' );
         $walker = new EML_Walker_Term_Checklist;
@@ -1279,27 +1274,6 @@ class EML_Taxonomies {
 
 
         // front-end archives
-        // if ( ! is_admin() && $query->is_main_query() ) {
-        //
-        //     $tax_options = eml()->get_option('tax_options');
-        //
-        //     if ( $tax_options['tax_archives'] ) {
-        //
-        //         $processed_taxonomies = $this->get_processed_taxonomies( array( 'eml_media' => true, 'assigned' => true ) );
-        //
-        //         foreach ( $processed_taxonomies as $taxonomy => $params ) {
-        //
-        //             if ( is_tax( $taxonomy ) ) {
-        //
-        //                 $query->set( 'post_type', 'attachment' );
-        //                 $query->set( 'post_status', 'inherit' );
-        //             }
-        //         }
-        //     }
-        // }
-
-
-        // front-end archives
         if ( ! is_admin() && $query->is_main_query() ) {
 
             $processed_taxonomies = $this->get_processed_taxonomies( array( 'media_only' => true, 'assigned' => true ) );
@@ -1554,10 +1528,6 @@ class EML_Walker_Term_Checklist extends Walker {
 
     public function start_el( &$output, $category, $depth = 0, $args = array(), $id = 0 ) {
 
-        // print_r($category);
-        // print_r($args);
-        // wp_die();
-
         if ( empty( $args['taxonomy'] ) ) {
             $taxonomy = 'category';
         } else {
@@ -1604,19 +1574,6 @@ class EML_Walker_Term_Checklist extends Walker {
         $output .= "</li>\n";
     }
 
-
-// class EML_Walker_Term_Checklist extends Walker {
-//
-//     function start_el( &$output, $category, $depth = 0, $args = array(), $id = 0 ) {
-//
-//         extract($args);
-//
-//         if ( empty($taxonomy) )
-//             $taxonomy = 'category';
-//
-//         $class = in_array( $category->term_id, $popular_cats ) ? ' class="popular-category"' : '';
-//         $output .= "\n<li id='{$taxonomy}-{$category->term_id}'$class><label class='selectit'><input value='0' type='hidden' name='tax_input[{$taxonomy}][{$category->term_id}]' /><input value='1' type='checkbox' name='tax_input[{$taxonomy}][{$category->term_id}]' id='in-{$taxonomy}-{$category->term_id}'" . checked( in_array( $category->term_id, $selected_cats ), true, false ) . disabled( empty( $args['disabled'] ), false, false ) . " />" . esc_html( apply_filters( 'the_category', $category->name ) ) . "</label>";
-//     }
 
 } // class EML_Walker_Term_Checklist
 

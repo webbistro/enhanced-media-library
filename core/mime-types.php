@@ -11,12 +11,26 @@ if ( ! class_exists( 'EML_MimeTypes' ) ) :
 class EML_MimeTypes {
 
     /**
-     * Constructor.
+     * Constructor. Intentionally left empty.
      *
      * @since   3.0
      */
 
-    function __construct() {
+    function __construct() {}
+
+
+
+    /**
+     *  The real constructor to initialize EML_MimeTypes.
+     *
+     *  @since  3.0
+     *  @date   30/01/17
+     *
+     *  @param  N/A
+     *  @return N/A
+     */
+
+    function initialize() {
 
         // mime types filters
         add_filter( 'post_mime_types', array( $this, 'post_mime_types' ) );

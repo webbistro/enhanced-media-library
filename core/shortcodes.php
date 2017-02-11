@@ -11,12 +11,26 @@ if ( ! class_exists( 'EML_Shortcodes' ) ) :
 class EML_Shortcodes {
 
     /**
-     * Constructor.
+     * Constructor. Intentionally left empty.
      *
      * @since   3.0
      */
 
-    function __construct() {
+    function __construct() {}
+
+
+
+    /**
+     *  The real constructor to initialize EML_Shortcodes.
+     *
+     *  @since  3.0
+     *  @date   30/01/17
+     *
+     *  @param  N/A
+     *  @return N/A
+     */
+
+    function initialize() {
 
         if ( $this->is_on() ) {
 

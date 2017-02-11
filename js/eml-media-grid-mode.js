@@ -23,14 +23,16 @@ window.wp = window.wp || {};
 
 
 
+
     var newEvents = { 'click .edit': 'emlEditAttachment' };
     _.extend( newEvents, media.view.Attachment.prototype.events);
 
+
     _.extend( media.view.Attachment.prototype, {
 
-        template:  media.template('attachment-grid-view'),
-
         events: newEvents,
+
+        template:  $( '#tmpl-attachment-grid-view' ).length ? media.template('attachment-grid-view') : media.template('attachment'),
 
         emlEditAttachment: function( event ) {
 
