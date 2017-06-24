@@ -1007,7 +1007,7 @@ window.eml = window.eml || { l10n: {} };
                 canClose:   this.controller.isModeActive( 'grid' ) || this.controller.isModeActive( 'eml-grid' )
             });
 
-            this.uploader.hide();
+            this.uploader.$el.addClass( 'hidden' );
             this.views.add( this.uploader );
         },
 

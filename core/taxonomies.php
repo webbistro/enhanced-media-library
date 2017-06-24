@@ -887,6 +887,15 @@ class EML_Taxonomies {
 
     function attachment_fields_to_edit( $form_fields, $post ) {
 
+        // $lib_options = eml()->get_option( 'lib_options' );
+
+
+        // if ( ! (bool) $lib_options['frontend_scripts'] && ! is_admin() ) {
+        // if ( ! is_admin() ) {
+        //     return $form_fields;
+        // }
+
+
         $tax_options = eml()->get_option( 'tax_options' );
         $walker = new EML_Walker_Term_Checklist;
         // $processed_taxonomies = $this->get_processed_taxonomies( array( 'assigned' => true ) );
@@ -1573,7 +1582,6 @@ class EML_Walker_Term_Checklist extends Walker {
     public function end_el( &$output, $category, $depth = 0, $args = array() ) {
         $output .= "</li>\n";
     }
-
 
 } // class EML_Walker_Term_Checklist
 

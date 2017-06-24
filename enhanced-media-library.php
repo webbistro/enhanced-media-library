@@ -3,7 +3,7 @@
 Plugin Name: Enhanced Media Library
 Plugin URI: http://wpUXsolutions.com
 Description: This plugin will be handy for those who need to manage a lot of media files.
-Version: 3.0.beta2-28
+Version: 3.0.beta2-29
 Author: wpUXsolutions
 Author URI: https://wpUXsolutions.com
 Text Domain: enhanced-media-library
@@ -30,7 +30,7 @@ class eml {
      *
      * @var string
      */
-    public $version = '3.0.beta2-28';
+    public $version = '3.0.beta2-29';
 
     /**
      * EML options.
@@ -167,8 +167,8 @@ class eml {
 
         // init actions
         add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
-        add_action( 'init', array( $this, 'register_admin_assets' ) );
-        add_action( 'init', array( $this, 'register_media_assets' ) );
+        add_action( 'wp_loaded', array( $this, 'register_admin_assets' ) );
+        add_action( 'wp_loaded', array( $this, 'register_media_assets' ) );
         // add_action( 'init', array( $this, 'init' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 
@@ -298,8 +298,8 @@ class eml {
             'tax_archive' => 1,
 
             'show_admin_column' => 1,
-            'admin_filter' => 1,             // list view filter
-            'media_uploader_filter' => 1,    // grid view filter
+            'admin_filter' => 1,          // list view filter
+            'media_uploader_filter' => 1, // grid view filter
             'media_popup_taxonomy_edit' => 1,
 
             'show_in_nav_menus' => 1,
@@ -366,7 +366,7 @@ class eml {
      *  @date   24/09/16
      */
 
-    function on_update() {
+    function on_update() { // TODO: test on_update since old versions carefully
 
         // update version
         update_option( 'wpuxss_eml_version', $this->version );
@@ -491,7 +491,6 @@ class eml {
 
         // styles
         wp_register_style( 'eml-admin', $dir . 'css/eml-admin.css', array(), $version, 'all' );
-        // wp_register_style( 'eml-admin-rtl', $dir . 'css/eml-admin-rtl.css', array(), $version, 'all' );
     }
 
 
