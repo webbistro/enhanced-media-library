@@ -13,3 +13,8 @@
 * Polylang compatibility
 * Front-end scripts - compatibility with various page builders
 * Tax archives per taxonomy
+
+### To make it work with page builders like Beaver Builder
+
+* Set `Front-end scripts` at `Settings > Media > Media Settings (tab) > Media Scripts (section)`
+* Set `Force filters` at `Settings > Media > Media Taxonomies (tab) > Options (section)`
