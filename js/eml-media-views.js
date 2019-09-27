@@ -181,7 +181,6 @@ window.eml = window.eml || { l10n: {} };
                 this.model.set( filter.props );
             }
 
-
             if ( filter && selection && selection.length && wp.Uploader.queue.length !== 1 ) {
                 selection.reset();
             }
@@ -461,11 +460,11 @@ window.eml = window.eml || { l10n: {} };
 
         filterChange: function( model ) {
             if ( 'trash' === model.get( 'status' ) ) {
-                this.model.set( 'text', l10n.untrashSelected );
+                this.model.set( 'text', l10n.restoreSelected );
             } else if ( wp.media.view.settings.mediaTrash ) {
-                this.model.set( 'text', l10n.trashSelected );
+                this.model.set( 'text', l10n.trash );
             } else {
-                this.model.set( 'text', l10n.deleteSelected );
+                this.model.set( 'text', l10n.deletePermanently );
             }
         },
 
@@ -812,7 +811,7 @@ window.eml = window.eml || { l10n: {} };
 
                     this.toolbar.set( 'deselectButton', new media.view.Button.Deselect ({
                         controller: this.controller,
-                        text: l10n.cancelSelection,
+                        text: l10n.cancel,
                         disabled: true,
                         priority: -70 + i++
                     }).render() );
@@ -822,7 +821,7 @@ window.eml = window.eml || { l10n: {} };
                         style: 'primary',
                         // className: 'delete-selected-button',
                         disabled: true,
-                        text: media.view.settings.mediaTrash ? l10n.trashSelected : l10n.deleteSelected,
+                        text: media.view.settings.mediaTrash ? l10n.trash : l10n.deletePermanently,
                         controller: this.controller,
                         priority: -70 + i++
                     }).render() );
@@ -832,7 +831,7 @@ window.eml = window.eml || { l10n: {} };
                             filters: Filters,
                             style: 'primary',
                             disabled: true,
-                            text: l10n.deleteSelected,
+                            text: l10n.deletePermanently,
                             controller: this.controller,
                             priority: -55
                         }).render() );
@@ -856,7 +855,7 @@ window.eml = window.eml || { l10n: {} };
                     filters: Filters,
                     style: 'primary',
                     disabled: true,
-                    text: media.view.settings.mediaTrash ? l10n.trashSelected : l10n.deleteSelected,
+                    text: media.view.settings.mediaTrash ? l10n.trash : l10n.deletePermanently,
                     controller: this.controller,
                     priority: -60,
                     click: function() {
@@ -916,7 +915,7 @@ window.eml = window.eml || { l10n: {} };
                         filters: Filters,
                         style: 'primary',
                         disabled: true,
-                        text: l10n.deleteSelected,
+                        text: l10n.deletePermanently,
                         controller: this.controller,
                         priority: -55,
                         click: function() {
